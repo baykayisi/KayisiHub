@@ -73,17 +73,26 @@ router.get('/users/list', authenticateToken, authorizeAdmin, async (req, res) =>
   try {
     const { page = 1, limit = 20, status, role } = req.query;
 
-    // Validate pagination
-    const { isValid, errors, page: validPage, limit: validLimit } = validatePagination(page, limit, 100);
-    if (!isValid) {
+    // Validate pagination - rejects if limit > max
+    const pageNum = parseInt(page);
+    const limitNum = parseInt(limit);
+    const maxLimit = 100;
+
+    if (isNaN(pageNum) || pageNum < 1) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid pagination parameters',
-        errors
+        message: 'Invalid page number'
       });
     }
 
-    const skip = (validPage - 1) * validLimit;
+    if (isNaN(limitNum) || limitNum < 1 || limitNum > maxLimit) {
+      return res.status(400).json({
+        success: false,
+        message: `Limit must be between 1 and ${maxLimit}`
+      });
+    }
+
+    const skip = (pageNum - 1) * limitNum;
     const filter = {};
 
     // Validate status filter
@@ -100,7 +109,7 @@ router.get('/users/list', authenticateToken, authorizeAdmin, async (req, res) =>
       .select('username email status role createdAt updatedAt')
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(validLimit);
+      .limit(limitNum);
 
     const total = await User.countDocuments(filter);
 
@@ -108,8 +117,8 @@ router.get('/users/list', authenticateToken, authorizeAdmin, async (req, res) =>
       success: true,
       users,
       pagination: {
-        current: validPage,
-        total: Math.ceil(total / validLimit),
+        current: pageNum,
+        total: Math.ceil(total / limitNum),
         count: users.length,
         total
       }
@@ -334,16 +343,25 @@ router.get('/listings', authenticateToken, authorizeAdmin, async (req, res) => {
   try {
     const { page = 1, limit = 20, status, game } = req.query;
 
-    const { isValid, errors, page: validPage, limit: validLimit } = validatePagination(page, limit, 100);
-    if (!isValid) {
+    const pageNum = parseInt(page);
+    const limitNum = parseInt(limit);
+    const maxLimit = 100;
+
+    if (isNaN(pageNum) || pageNum < 1) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid pagination parameters',
-        errors
+        message: 'Invalid page number'
       });
     }
 
-    const skip = (validPage - 1) * validLimit;
+    if (isNaN(limitNum) || limitNum < 1 || limitNum > maxLimit) {
+      return res.status(400).json({
+        success: false,
+        message: `Limit must be between 1 and ${maxLimit}`
+      });
+    }
+
+    const skip = (pageNum - 1) * limitNum;
     const filter = {};
 
     if (status && ['active', 'sold', 'removed'].includes(status)) {
@@ -360,7 +378,7 @@ router.get('/listings', authenticateToken, authorizeAdmin, async (req, res) => {
       .populate('category', 'name')
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(validLimit);
+      .limit(limitNum);
 
     const total = await Listing.countDocuments(filter);
 
@@ -368,8 +386,8 @@ router.get('/listings', authenticateToken, authorizeAdmin, async (req, res) => {
       success: true,
       listings,
       pagination: {
-        current: validPage,
-        total: Math.ceil(total / validLimit),
+        current: pageNum,
+        total: Math.ceil(total / limitNum),
         count: listings.length,
         total
       }
@@ -388,26 +406,33 @@ router.get('/listings', authenticateToken, authorizeAdmin, async (req, res) => {
  */
 router.get('/audit-logs', authenticateToken, authorizeAdmin, async (req, res) => {
   try {
-    const { page = 1, limit = 50, action, targetUser, startDate, endDate } = req.query;
+    const { page = 1, limit = 50, action, targetUser } = req.query;
 
-    const { isValid, errors, page: validPage, limit: validLimit } = validatePagination(page, limit, 100);
-    if (!isValid) {
+    const pageNum = parseInt(page);
+    const limitNum = parseInt(limit);
+    const maxLimit = 100;
+
+    if (isNaN(pageNum) || pageNum < 1) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid pagination parameters',
-        errors
+        message: 'Invalid page number'
+      });
+    }
+
+    if (isNaN(limitNum) || limitNum < 1 || limitNum > maxLimit) {
+      return res.status(400).json({
+        success: false,
+        message: `Limit must be between 1 and ${maxLimit}`
       });
     }
 
     const filters = {
-      page: validPage,
-      limit: validLimit
+      page: pageNum,
+      limit: limitNum
     };
 
     if (action) filters.action = action;
     if (targetUser && isValidObjectId(targetUser)) filters.targetUser = targetUser;
-    if (startDate) filters.startDate = startDate;
-    if (endDate) filters.endDate = endDate;
 
     const { logs, pagination } = await getAuditLogs(filters);
 

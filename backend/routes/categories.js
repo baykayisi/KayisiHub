@@ -15,7 +15,7 @@ router.get('/', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to fetch categories',
-      error: error.message
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });
@@ -52,7 +52,7 @@ router.post('/', authenticateToken, authorizeAdmin, async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to create category',
-      error: error.message
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });

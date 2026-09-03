@@ -26,7 +26,7 @@ router.get('/:id', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to fetch user',
-      error: error.message
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });
@@ -65,7 +65,7 @@ router.put('/:id', authenticateToken, async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to update profile',
-      error: error.message
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });
@@ -86,9 +86,9 @@ router.get('/:id/listings', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to fetch user listings',
-      error: error.message
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });
 
-module.module.exports = router;
+module.exports = router;

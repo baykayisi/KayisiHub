@@ -4,6 +4,12 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const { authenticateToken } = require('../middleware/auth');
 
+const JWT_SECRET = process.env.JWT_SECRET;
+
+if (!JWT_SECRET && process.env.NODE_ENV === 'production') {
+  throw new Error('JWT_SECRET environment variable is required in production');
+}
+
 // Register
 router.post('/register', async (req, res) => {
   try {
@@ -40,7 +46,7 @@ router.post('/register', async (req, res) => {
     // Create token
     const token = jwt.sign(
       { id: user._id, email: user.email, role: user.role },
-      process.env.JWT_SECRET || 'test-secret',
+      JWT_SECRET,
       { expiresIn: '7d' }
     );
 
@@ -59,7 +65,7 @@ router.post('/register', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Registration failed',
-      error: error.message
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });
@@ -98,7 +104,7 @@ router.post('/login', async (req, res) => {
     // Create token
     const token = jwt.sign(
       { id: user._id, email: user.email, role: user.role },
-      process.env.JWT_SECRET || 'test-secret',
+      JWT_SECRET,
       { expiresIn: '7d' }
     );
 
@@ -117,7 +123,7 @@ router.post('/login', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Login failed',
-      error: error.message
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });
@@ -134,7 +140,7 @@ router.get('/me', authenticateToken, async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to fetch user',
-      error: error.message
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });

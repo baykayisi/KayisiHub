@@ -37,7 +37,7 @@ router.get('/', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to fetch listings',
-      error: error.message
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });
@@ -68,7 +68,7 @@ router.get('/:id', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to fetch listing',
-      error: error.message
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });
@@ -115,7 +115,7 @@ router.post('/', authenticateToken, async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to create listing',
-      error: error.message
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });
@@ -157,7 +157,7 @@ router.put('/:id', authenticateToken, async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to update listing',
-      error: error.message
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });
@@ -195,7 +195,7 @@ router.delete('/:id', authenticateToken, async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to delete listing',
-      error: error.message
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });
