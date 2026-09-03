@@ -1,0 +1,26 @@
+{
+  "name": "kayisihub",
+  "version": "0.1.0",
+  "description": "Gaming marketplace platform for buying and selling in-game items",
+  "main": "server.js",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "start": "cd backend && npm start",
+    "build": "cd frontend && npm run build",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install"
+  },
+  "keywords": [
+    "gaming",
+    "marketplace",
+    "mobile-legends",
+    "pubg",
+    "free-fire"
+  ],
+  "author": "baykayisi",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.0.0"
+  }
+}
